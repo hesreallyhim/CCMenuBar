@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🎬 Claude starting...\""
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"⏯️ Resuming session\""
+          }
+        ]
+      },
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🧹 Fresh start!\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prompt=$(echo \"$(cat)\" | jq -r '.prompt' | head -c 30); ccmenubar \"💭 Processing: ${prompt}...\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "task=$(echo \"$(cat)\" | jq -r '.tool_input.task // \"task\"' | head -c 25); ccmenubar \"🤖 Subagent: $task\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(echo \"$(cat)\" | jq -r '.tool_input.command' | head -c 30); ccmenubar \"🖥️ $ ${cmd}...\""
+          }
+        ]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pattern=$(echo \"$(cat)\" | jq -r '.tool_input.pattern // \"*\"' | head -c 20); ccmenubar \"🎯 Glob: $pattern\""
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "search=$(echo \"$(cat)\" | jq -r '.tool_input.pattern // \"pattern\"' | head -c 20); ccmenubar \"🔍 Grep: $search\""
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path' | xargs basename 2>/dev/null || echo \"file\"); ccmenubar \"📖 Reading: $file\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path // .tool_input.files[0].file_path // \"file\"' | xargs basename 2>/dev/null || echo \"files\"); ccmenubar \"✏️ Editing: $file\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path' | xargs basename 2>/dev/null || echo \"file\"); ccmenubar \"📝 Writing: $file\""
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "query=$(echo \"$(cat)\" | jq -r '.tool_input.query // \"web\"' | head -c 20); ccmenubar \"🌐 Searching: $query\""
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "url=$(echo \"$(cat)\" | jq -r '.tool_input.url' | sed 's|https\\?://||' | cut -d/ -f1); ccmenubar \"🌐 Fetching: $url\""
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mcp=$(echo \"$(cat)\" | jq -r '.tool_name' | sed 's/mcp__//' | sed 's/__/ → /'); ccmenubar \"🔌 MCP: $mcp\""
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tool=$(echo \"$(cat)\" | jq -r '.tool_name'); [ \"$tool\" != \"\" ] && ccmenubar \"⚙️ Tool: $tool\" || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "exit_code=$(echo \"$(cat)\" | jq -r '.tool_response.exit_code // .tool_response.exitCode // 0'); if [ \"$exit_code\" = \"0\" ]; then ccmenubar \"✅ Shell OK\"; else ccmenubar \"⚠️ Exit: $exit_code\"; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "success=$(echo \"$(cat)\" | jq -r '.tool_response.success // true'); if [ \"$success\" = \"true\" ]; then ccmenubar \"✅ File saved\"; else ccmenubar \"❌ Save failed\"; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "status=$(echo \"$(cat)\" | jq -r '.tool_response.status // \"complete\"'); ccmenubar \"🤖 Subagent: $status\""
+          }
+        ]
+      },
+      {
+        "matcher": "Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "count=$(echo \"$(cat)\" | jq -r '.tool_response.matches // .tool_response.files // [] | length' 2>/dev/null || echo \"0\"); ccmenubar \"📊 Found: $count matches\""
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "results=$(echo \"$(cat)\" | jq -r '.tool_response.results // [] | length' 2>/dev/null || echo \"0\"); ccmenubar \"🌐 $results results\""
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "server=$(echo \"$(cat)\" | jq -r '.tool_name' | sed 's/mcp__\\([^_]*\\).*/\\1/'); ccmenubar \"✅ MCP $server done\""
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "msg=$(echo \"$(cat)\" | jq -r '.message'); case \"$msg\" in *permission*) ccmenubar \"🔐 Permission needed\" ;; *waiting*) ccmenubar \"⏳ Waiting for you...\" ;; *) ccmenubar \"❗ ${msg:0:30}\" ;; esac"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "stop_active=$(echo \"$(cat)\" | jq -r '.stop_hook_active // false'); if [ \"$stop_active\" = \"true\" ]; then ccmenubar \"🔄 Continuing...\"; else ccmenubar \"✅ Done!\"; fi"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🤖✅ Subagent done\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🗜️ Compacting (manual)\""
+          }
+        ]
+      },
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🗜️ Auto-compacting\""
+          }
+        ]
+      }
+    ]
+  }
+}

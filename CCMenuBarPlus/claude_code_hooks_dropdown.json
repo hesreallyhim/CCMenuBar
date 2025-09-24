@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"👋 Claude ready!\" && ccmenubar --clear-all"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prompt=$(echo \"$(cat)\" | jq -r '.prompt' | head -c 50); ccmenubar \"🤔 Thinking...\" && ccmenubar --add-task \"$prompt\" \"💭\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "task=$(echo \"$(cat)\" | jq -r '.tool_input.task // \"task\"' | head -c 40); ccmenubar \"🤖 Subagent\" && ccmenubar --add-task \"$task\" \"🤖\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(echo \"$(cat)\" | jq -r '.tool_input.command' | head -c 40); ccmenubar \"🖥️ Running...\" && ccmenubar --add-task \"Shell: ${cmd}...\" \"🖥️\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path'); ccmenubar \"📝 Writing...\" && ccmenubar --add-file \"$file\" \"📝\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path // .tool_input.files[0].file_path'); ccmenubar \"✏️ Editing...\" && ccmenubar --add-file \"$file\" \"✏️\""
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(echo \"$(cat)\" | jq -r '.tool_input.file_path'); ccmenubar \"📖 Reading...\" && ccmenubar --add-file \"$file\" \"📖\""
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pattern=$(echo \"$(cat)\" | jq -r '.tool_input.pattern' | head -c 30); ccmenubar \"🔍 Searching...\" && ccmenubar --add-task \"Search: $pattern\" \"🔍\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "exit_code=$(echo \"$(cat)\" | jq -r '.tool_response.exit_code // .tool_response.exitCode // 0'); if [ \"$exit_code\" = \"0\" ]; then ccmenubar \"✅ Shell OK\" && ccmenubar --clear-tasks; else ccmenubar \"⚠️ Exit: $exit_code\"; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# Update file count in menu\nfile_count=$(ccmenubar --status 2>&1 | grep -q running && find . -name '*.py' -o -name '*.js' -o -name '*.ts' 2>/dev/null | wc -l || echo 0); ccmenubar --menu-items \"Files edited: $file_count\" \"Last save: $(date '+%H:%M:%S')\""
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "matches=$(echo \"$(cat)\" | jq -r '.tool_response.matches // [] | length' 2>/dev/null || echo 0); ccmenubar \"📊 Found $matches matches\" && ccmenubar --menu-items \"Search results: $matches\""
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🤖 Subagent done\" && ccmenubar --clear-tasks"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "msg=$(echo \"$(cat)\" | jq -r '.message'); ccmenubar \"❗ Attention!\" && ccmenubar --add-todo \"$msg\" \"❗\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# Create summary stats\nfiles=$(find . -name '*.py' -o -name '*.js' -o -name '*.ts' 2>/dev/null | wc -l || echo 0); \ntodos=$(ccmenubar --status 2>&1 | grep -q running && echo \"Check menu for todos\" || echo \"0\"); \nccmenubar \"✅ Task complete!\" && \nccmenubar --menu-items \"Session complete\" \"Files processed: $files\" \"Time: $(date '+%H:%M')\" && \nccmenubar --add-todo \"Review changes\" \"⬜\" && \nccmenubar --add-todo \"Test implementation\" \"⬜\" && \nccmenubar --add-todo \"Commit to git\" \"⬜\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccmenubar \"🗜️ Compacting...\" && ccmenubar --add-task \"Memory cleanup\" \"🗜️\""
+          }
+        ]
+      }
+    ]
+  }
+}

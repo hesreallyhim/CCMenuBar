@@ -1,126 +1,307 @@
-# CCMenuBar — Simple macOS Menu Bar Status Widget
+# CCMenuBar - Claude Code Status Tracker for macOS 🚀
 
-This repo contains:
-- `CCMenuBar.scpt` — AppleScriptObjC source for the menu-bar app
-- `claude-logo.png` — icon shown in the menu bar
-- `ccmenubar.sh` — shell helper used by hooks and from your terminal
-- `settings.json` — ready-to-use Claude Code hooks configuration (feel free to customize)
+A lightweight macOS menu bar app that displays Claude Code's real-time status, perfect for keeping track of what Claude is doing while you work on other things.
 
----
+![Status Bar Example](https://img.shields.io/badge/status-Running%3A%20bash-green)
 
-## Setup (3–5 minutes)
+## What is this?
 
-### 1) Build the app
-1. Open **Script Editor** → **File → Open…** → select `CCMenuBar.scpt`.
-2. **File → Export…** → **File Format: Application** → check **Stay open after run handler** → save as `CCMenuBar.app`.  
-   (Claude Code hooks live in `settings.json`; app and hooks settings are separate files.)  [oai_citation:0‡Claude Docs](https://docs.claude.com/en/docs/claude-code/settings?utm_source=chatgpt.com)
+CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Claude is running tools, needs your attention, or has finished a task, you'll see it at a glance without switching windows. Perfect for long-running tasks or when you want to multitask while Claude works!
 
-### 2) Add the icon
-- Finder → right-click `CCMenuBar.app` → **Show Package Contents** → `Contents/Resources/`.
-- Copy `claude-logo.png` into `Resources/`.  
-  The script loads it from the bundle at runtime; the status item itself is created via AppKit’s `NSStatusItem`.  [oai_citation:1‡Apple Developer](https://developer.apple.com/documentation/appkit/nsstatusitem?utm_source=chatgpt.com)
+## Features
 
-### 3) Make the helper available in your shell
-- Ensure the helper is executable and sourced:
-  ```bash
-  chmod +x ./ccmenubar.sh
-  echo 'source /absolute/path/to/ccmenubar.sh' >> ~/.zshrc   # or ~/.bashrc
+- 🎯 **Real-time status updates** in your macOS menu bar
+- 🔧 **Claude Code hooks integration** for automatic updates
+- 🎨 **Custom Claude icon** for easy identification
+- 📝 **Simple command-line interface** for manual updates
+- ⚡ **Lightweight** AppleScript-based implementation
 
-	•	Open a new shell and test:
+## Quick Start
 
-ccmenubar "🟡 Idle"
-ccmenubar "🟢 Running: Example"
-ccmenubar "✅ DONE"
+### Prerequisites
 
+- macOS (tested on macOS 12+ but should work on earlier versions)
+- Claude Code CLI installed
+- Basic command line familiarity
 
+### Installation
 
-⸻
+1. **Clone this repository:**
+   ```bash
+   git clone https://github.com/yourusername/ccmenubar.git
+   cd ccmenubar
+   ```
 
-Claude Code hook integration
+2. **Build the menu bar app:**
+   - Open `CCMenuBar.scpt` in Script Editor
+   - Choose **File → Export...**
+   - Set these options:
+     - **File Format:** Application
+     - **Name:** CCMenuBar
+     - ☑️ **Stay open after run handler** (IMPORTANT!)
+     - **Where:** /Applications (or your preferred location)
+   - Click **Save**
 
-This repo includes a settings.json that wires up three hooks:
-	•	PreToolUse → ccmenubar "🟢 Running: <tool_name>"
-	•	Notification → ccmenubar "❗ ATTN!"
-	•	Stop → ccmenubar "✅ DONE"
+3. **Add the icon to the app:**
+   ```bash
+   cp claude-logo.png /Applications/CCMenuBar.app/Contents/Resources/
+   ```
 
-Claude Code looks for settings here (use either):
-	•	User: ~/.claude/settings.json
-	•	Project: .claude/settings.json (commit to share with teammates)  ￼
+4. **Install the command-line wrapper:**
+   ```bash
+   sudo cp ccmenubar /usr/local/bin/
+   sudo chmod +x /usr/local/bin/ccmenubar
+   ```
 
-Install the provided settings
+5. **Launch the app:**
+   ```bash
+   ccmenubar --start
+   # Or double-click CCMenuBar.app in /Applications
+   ```
 
-Pick one:
+You should now see "![logo](claude-logo-small.png) CLAUDE" in your menu bar!
 
-A. Project-local (recommended for repos):
+## Usage
 
-mkdir -p .claude
-cp settings.json .claude/settings.json
+### Manual Updates
 
-B. User-level:
+Update the status from anywhere in your terminal:
 
-mkdir -p ~/.claude
-cp settings.json ~/.claude/settings.json
+```bash
+# Simple status updates
+ccmenubar "🔨 Building project..."
+ccmenubar "✅ Build complete!"
+ccmenubar "🐛 Debugging issue"
 
-The file references the public schema to enable editor validation & autocomplete.  ￼
+# Dynamic updates
+ccmenubar "$(date '+%H:%M') - Idle"
+ccmenubar "CPU: $(top -l 1 | grep 'CPU usage' | awk '{print $3}')"
 
-Requirements
-	•	ccmenubar on your $PATH (or edit command to a full path).
-	•	jq installed if you keep the PreToolUse variant that parses tool_name with jq. (You can swap to a Python inline parser if preferred.)
-	•	Valid JSON (no trailing commas).
-	•	Optional: add "timeout": 10 to each hook entry to avoid blocking.  ￼
+# From scripts
+#!/bin/bash
+ccmenubar "🚀 Deployment started"
+./deploy.sh
+ccmenubar "✅ Deployment complete"
+```
 
-Event references
+### Command Options
 
-Hook events supported include PreToolUse, Notification, and Stop; hooks receive JSON on stdin (your config already parses .tool_name for PreToolUse).  ￼
+```bash
+ccmenubar "text"       # Set the status text
+ccmenubar --start      # Launch the menu bar app
+ccmenubar --quit       # Quit the app
+ccmenubar --status     # Check if app is running
+ccmenubar --help       # Show help message
 
-⸻
+# Pipe support
+echo "Status update" | ccmenubar -
+```
 
-Appendix: Provided settings.json
+## Claude Code Integration 🤖
 
-Already in the repo; shown here for clarity.
+The real magic happens when you integrate CCMenuBar with Claude Code hooks!
 
+### Setup Claude Code Hooks
+
+1. **Copy the example settings to your project:**
+   ```bash
+   cp settings.json ~/your-project/.claude/settings.json
+   ```
+
+2. **Customize the hooks** (or use the defaults):
+
+   ```json
+   {
+     "$schema": "https://json.schemastore.org/claude-code-settings.json",
+     "hooks": {
+       "PreToolUse": [
+         {
+           "matcher": "*",
+           "hooks": [
+             {
+               "type": "command",
+               "command": "tool=$(echo \"$(cat)\" | jq -r .tool_name); ccmenubar \"🟢 Running: $tool\""
+             }
+           ]
+         }
+       ],
+       "Notification": [
+         {
+           "hooks": [
+             {
+               "type": "command",
+               "command": "ccmenubar \"❗ ATTN!\""
+             }
+           ]
+         }
+       ],
+       "Stop": [
+         {
+           "hooks": [
+             {
+               "type": "command",
+               "command": "ccmenubar \"✅ DONE\""
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+### Available Hooks
+
+| Hook | Trigger | Example Status |
+|------|---------|----------------|
+| `PreToolUse` | Before Claude runs any tool | 🟢 Running: bash |
+| `PostToolUse` | After tool completion | ✔️ Completed: write_file |
+| `Notification` | When Claude needs attention | ❗ ATTN! |
+| `Stop` | When task completes | ✅ DONE |
+| `Error` | On errors | ❌ Error occurred |
+
+### Advanced Hook Examples
+
+```json
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "*",
+        "matcher": "bash",
         "hooks": [
           {
             "type": "command",
-            "command": "tool=$(echo \"$(cat)\" | jq -r .tool_name); ccmenubar \"🟢 Running: $tool\""
+            "command": "ccmenubar \"🖥️ Executing shell command...\""
           }
         ]
-      }
-    ],
-    "Notification": [
+      },
       {
+        "matcher": "write_file",
         "hooks": [
           {
             "type": "command",
-            "command": "ccmenubar \"❗ ATTN!\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ccmenubar \"✅ DONE\""
+            "command": "file=$(echo \"$(cat)\" | jq -r .path); ccmenubar \"✏️ Writing: $(basename $file)\""
           }
         ]
       }
     ]
   }
 }
+```
 
-Tip: if you don’t want a jq dependency, replace the PreToolUse command with:
-tool=$(echo \"$(cat)\" | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"tool_name\",\"\"))'); ccmenubar \"🟢 Running: $tool\"  ￼
+## Customization Ideas 💡
 
-⸻
+### Time Tracking
+```bash
+# Add to PreToolUse hook
+ccmenubar "$(date '+%H:%M') - Working..."
+```
 
-Troubleshooting
-	•	If no update appears, confirm CCMenuBar.app is running (the app must stay open), the helper is sourced in your shell, and the settings file is in one of the recognized locations.  ￼
-	•	Validate your JSON against the published schema to catch typos early.  ￼
+### Project Context
+```bash
+# Add project name to status
+ccmenubar "📁 $(basename $(pwd)): Building..."
+```
+
+### Git Branch Indicator
+```bash
+# Show current branch
+branch=$(git branch --show-current 2>/dev/null || echo "no-git")
+ccmenubar "🌿 $branch: Coding..."
+```
+
+### System Resource Monitor
+```bash
+# Create a monitoring script
+#!/bin/bash
+while true; do
+    cpu=$(ps -A -o %cpu | awk '{s+=$1} END {print s "%"}')
+    ccmenubar "CPU: $cpu"
+    sleep 5
+done
+```
+
+## Troubleshooting
+
+### App doesn't stay in menu bar
+- Make sure you exported with "Stay open after run handler" checked
+- The app needs to be a stay-open application to persist
+
+### "command not found: ccmenubar"
+```bash
+# Check if installed
+ls -la /usr/local/bin/ccmenubar
+
+# If missing, reinstall
+sudo cp ccmenubar /usr/local/bin/
+sudo chmod +x /usr/local/bin/ccmenubar
+```
+
+### Icon not showing
+```bash
+# Verify icon is in the right place
+ls -la /Applications/CCMenuBar.app/Contents/Resources/claude-logo.png
+
+# If missing, copy it
+cp claude-logo.png /Applications/CCMenuBar.app/Contents/Resources/
+```
+
+### Status not updating from Claude Code
+1. Check if the app is running: `ccmenubar --status`
+2. Test manual update: `ccmenubar "Test"`
+3. Verify jq is installed: `brew install jq`
+4. Check Claude Code settings: `claude code settings --show`
+
+### App crashes or won't start
+- Open Console.app and filter for "CCMenuBar" to see error messages
+- Try rebuilding the app from the AppleScript source
+- Make sure you're on a supported macOS version
+
+## Pro Tips 🎯
+
+1. **Auto-start on login:** Add CCMenuBar.app to System Preferences → Users & Groups → Login Items
+
+2. **Quick toggle:** Create an alias in your `.zshrc`:
+   ```bash
+   alias ccs='ccmenubar'  # Now use: ccs "Status"
+   ```
+
+3. **Project-specific statuses:** Add to your project's Makefile:
+   ```makefile
+   build:
+       @ccmenubar "🔨 Building $(PROJECT_NAME)..."
+       @$(MAKE) compile
+       @ccmenubar "✅ Build complete!"
+   ```
+
+4. **Combine with other tools:**
+   ```bash
+   # With tmux
+   tmux send-keys "ccmenubar 'Running in tmux'" C-m
+
+   # With watch
+   watch -n 5 'ccmenubar "Files: $(ls -1 | wc -l)"'
+   ```
+
+## Contributing
+
+Found a bug? Have an idea? Feel free to:
+- Open an issue
+- Submit a pull request
+- Share your custom hooks and use cases!
+
+## License
+
+MIT - Use it however you like!
+
+## Acknowledgments
+
+- Built for the [Claude Code](https://claude.ai) community
+- Icon designed for optimal menu bar visibility
+- Inspired by the need to track long-running AI tasks
+- Claude Code, and the Claude Logo, are the property of Anthropic.
+
+---
+
+**Happy coding with Claude!** 🤖✨
+
+*Remember: The menu bar is your window into Claude's mind. Keep an eye on it, and you'll always know what your AI assistant is up to!*

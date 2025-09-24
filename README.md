@@ -8,6 +8,8 @@ A lightweight macOS menu bar app that displays Claude Code's real-time status, p
 
 CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Claude is running tools, needs your attention, or has finished a task, you'll see it at a glance without switching windows. Perfect for long-running tasks or when you want to multitask while Claude works!
 
+> **I'm petty af so this is mostly just a vibe-coded app I made to prove a point. That being said, it's pretty nice, IMHO. Most of it is still in development, especially the "enhanced" version. I would recommend, if you want to try it - clone the repo, read the applescript, read the shell script, set up the hooks, and install it yourself - if you don't have much experience with that, it's a good way to learn. That being said, there are install-helpers to make it easier as well. I think there's even a brew distribution. Since you asked for my opinion, if you see something nice, and it's not open source, just build it yourself/have your AI assistant build it. It's way more fun.** 
+
 ## Features
 
 - 🎯 **Real-time status updates** in your macOS menu bar

@@ -59,7 +59,7 @@ CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Clau
    # Or double-click CCMenuBar.app in /Applications
    ```
 
-You should now see "![logo](./assets/claude_logo-small.png) CLAUDE" in your menu bar!
+You should now see "![logo](./assets/claude_logo_small.png) CLAUDE" in your menu bar!
 
 ## Usage
 
@@ -291,7 +291,7 @@ Found a bug? Have an idea? Feel free to:
 
 ## License
 
-MIT - Use it however you like!
+GPL-3.0
 
 ## Acknowledgments
 

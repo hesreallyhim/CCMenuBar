@@ -4,6 +4,8 @@ A lightweight macOS menu bar app that displays Claude Code's real-time status, p
 
 ![Status Bar Example](https://img.shields.io/badge/status-Running%3A%20bash-green)
 
+![CCMenuBar Example](./assets/CCMenuBarExample.png)
+
 ## What is this?
 
 CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Claude is running tools, needs your attention, or has finished a task, you'll see it at a glance without switching windows. Perfect for long-running tasks or when you want to multitask while Claude works!

@@ -1,0 +1,53 @@
+╔════════════════════════════════════╗
+║ 🤖 CLAUDE    ▼                      ║ ← Menu Bar
+╚════════════════════════════════════╝
+         │
+         ▼
+╔════════════════════════════════════╗
+║ 📊 Current Status                   ║
+║    🖥️ Running: npm test            ║
+║ ────────────────────────────────── ║
+║ ✅ TODOs                            ║
+║    ☐ Fix login bug                 ║
+║    ☐ Review PR #42                 ║
+║    ☑ Update documentation          ║
+║    ☐ main.js: TODO: Add auth       ║
+║    ☐ Check: Failed write config    ║
+║ ────────────────────────────────── ║
+║ 🕐 Recent Actions                   ║
+║    16:45 - ✅ Task complete!       ║
+║    16:44 - 📊 Found 3 matches      ║
+║    16:43 - 🔍 Searching: TODO      ║
+║    16:42 - ✏️ Writing: auth.js     ║
+║    16:41 - 🖥️ $ npm test           ║
+║ ────────────────────────────────── ║
+║ 📈 Session Stats                    ║
+║    Commands: 24 | Files: 56        ║
+║ ────────────────────────────────── ║
+║ 🗑️ Clear History                    ║
+║ 🔄 Refresh                     ⌘R  ║
+║ ────────────────────────────────── ║
+║ Quit CCMenuBar                 ⌘Q  ║
+╚════════════════════════════════════╝
+
+FEATURES:
+• Updates every 5 seconds automatically
+• TODOs persist across sessions
+• Click any item to copy (future feature)
+• Statistics track all operations
+• Recent actions show last 5 items
+• Smart emoji indicators for status
+
+STATUS EMOJIS:
+🎬 Starting     ✅ Success      🖥️ Shell
+🤔 Thinking     ⚠️ Warning      📝 Write  
+🔍 Searching    ❌ Error        📖 Read
+🌐 Web          ❗ Alert        ✏️ Edit
+🤖 Subagent     🔐 Permission   📁 Directory
+🗜️ Compacting   ⏳ Waiting      🏁 Complete
+
+TODO STATES:
+☐ = Pending (not started)
+☑ = Completed (done)
+⚠️ = Blocked (future feature)
+🔄 = In Progress (future feature)

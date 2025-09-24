@@ -3,6 +3,7 @@ use framework "AppKit"
 use framework "Foundation"
 use scripting additions
 
+property appVersion : "1.0.0"
 property statusItem : missing value
 property statusMenu : missing value
 property isRunning : false
@@ -15,7 +16,7 @@ on run
 	if not isRunning then
 		try
 			-- Load bundled icon (placed in Contents/Resources)
-			set rPath to POSIX path of (path to resource "claude-logo.png")
+			set rPath to POSIX path of (path to resource "claude_logo.png")
 			set img to (current application's NSImage's alloc()'s initWithContentsOfFile:rPath)
 			
 			if img is not missing value then

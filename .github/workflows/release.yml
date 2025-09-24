@@ -1,0 +1,135 @@
+name: Build and Release CCMenuBar
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  VERSION: "1.0.0"
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up environment
+      run: |
+        brew install jq
+        echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+    
+    - name: Build application
+      run: |
+        # Compile AppleScript to .app
+        osacompile -o "CCMenuBar.app" "CCMenuBar_Enhanced.scpt"
+        
+        # Set app properties
+        defaults write "$PWD/CCMenuBar.app/Contents/Info.plist" CFBundleIdentifier "com.claude.ccmenubar"
+        defaults write "$PWD/CCMenuBar.app/Contents/Info.plist" CFBundleVersion "$VERSION"
+        defaults write "$PWD/CCMenuBar.app/Contents/Info.plist" CFBundleShortVersionString "$VERSION"
+        defaults write "$PWD/CCMenuBar.app/Contents/Info.plist" LSUIElement -bool true
+        
+        # Copy resources
+        cp claude_logo.png "CCMenuBar.app/Contents/Resources/" || true
+    
+    - name: Create DMG
+      run: |
+        mkdir dmg
+        cp -R CCMenuBar.app dmg/
+        ln -s /Applications dmg/Applications
+        cp README.md dmg/ || true
+        cp ccmenubar_enhanced dmg/Install-CLI-Tool
+        
+        hdiutil create -volname "CCMenuBar" -srcfolder dmg -ov -format UDZO "CCMenuBar-$VERSION.dmg"
+    
+    - name: Create ZIP
+      run: |
+        mkdir -p release
+        cp -R CCMenuBar.app release/
+        cp ccmenubar_enhanced release/
+        cp install.sh release/
+        cp README.md release/ || true
+        cp claude_code_hooks_dropdown.json release/ || true
+        
+        cd release
+        zip -r "../CCMenuBar-$VERSION.zip" .
+        cd ..
+    
+    - name: Create PKG
+      run: |
+        mkdir -p pkg-root/Applications
+        mkdir -p pkg-root/usr/local/bin
+        cp -R CCMenuBar.app pkg-root/Applications/
+        cp ccmenubar_enhanced pkg-root/usr/local/bin/ccmenubar
+        
+        pkgbuild \
+          --root pkg-root \
+          --identifier "com.claude.ccmenubar" \
+          --version "$VERSION" \
+          --install-location "/" \
+          "CCMenuBar-$VERSION.pkg"
+    
+    - name: Generate checksums
+      run: |
+        shasum -a 256 *.dmg *.pkg *.zip > checksums.txt
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        draft: false
+        prerelease: false
+        name: CCMenuBar v${{ env.VERSION }}
+        body: |
+          # CCMenuBar v${{ env.VERSION }}
+          
+          Claude Code status tracker for macOS menu bar with dropdown menu support.
+          
+          ## 📦 Installation Methods
+          
+          ### Option 1: DMG Installer (Recommended)
+          Download `CCMenuBar-${{ env.VERSION }}.dmg` and drag CCMenuBar to Applications.
+          
+          ### Option 2: Homebrew
+          ```bash
+          brew tap hesreallyhim/ccmenubar
+          brew install --cask ccmenubar
+          ```
+          
+          ### Option 3: One-Line Installer
+          ```bash
+          curl -sL https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/install.sh | bash
+          ```
+          
+          ### Option 4: PKG Installer
+          Download `CCMenuBar-${{ env.VERSION }}.pkg` for traditional installation.
+          
+          ### Option 5: Manual (ZIP)
+          Download `CCMenuBar-${{ env.VERSION }}.zip` and follow README instructions.
+          
+          ## ✨ What's New
+          - Dropdown menu with todos, files, and tasks
+          - Claude Code hooks integration
+          - One-click installation
+          - Auto-start option
+          
+          ## 📝 Checksums
+          See `checksums.txt` for SHA-256 hashes.
+          
+        files: |
+          CCMenuBar-*.dmg
+          CCMenuBar-*.pkg
+          CCMenuBar-*.zip
+          install.sh
+          checksums.txt
+          ccmenubar.rb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update Homebrew Tap
+      run: |
+        # This would update your homebrew tap repository
+        echo "Update homebrew tap with new version and SHA"

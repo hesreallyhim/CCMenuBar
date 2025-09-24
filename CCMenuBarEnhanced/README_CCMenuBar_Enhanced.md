@@ -58,7 +58,7 @@ The pro version adds a **fully interactive dropdown menu** that shows:
 ### 2. Add the Icon
 
 ```bash
-cp claude-logo.png /Applications/CCMenuBar.app/Contents/Resources/
+cp claude_logo.png /Applications/CCMenuBar.app/Contents/Resources/
 ```
 
 ### 3. Install Pro Wrapper

@@ -28,7 +28,7 @@ CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Clau
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/yourusername/ccmenubar.git
+   git clone https://github.com/hesreallyhim/ccmenubar.git
    cd ccmenubar
    ```
 
@@ -44,7 +44,7 @@ CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Clau
 
 3. **Add the icon to the app:**
    ```bash
-   cp claude-logo.png /Applications/CCMenuBar.app/Contents/Resources/
+   cp claude_logo.png /Applications/CCMenuBar.app/Contents/Resources/
    ```
 
 4. **Install the command-line wrapper:**
@@ -59,7 +59,7 @@ CCMenuBar puts Claude Code's activity right in your macOS menu bar. Whether Clau
    # Or double-click CCMenuBar.app in /Applications
    ```
 
-You should now see "![logo](claude-logo-small.png) CLAUDE" in your menu bar!
+You should now see "![logo](./assets/claude_logo-small.png) CLAUDE" in your menu bar!
 
 ## Usage
 
@@ -239,10 +239,10 @@ sudo chmod +x /usr/local/bin/ccmenubar
 ### Icon not showing
 ```bash
 # Verify icon is in the right place
-ls -la /Applications/CCMenuBar.app/Contents/Resources/claude-logo.png
+ls -la /Applications/CCMenuBar.app/Contents/Resources/claude_logo.png
 
 # If missing, copy it
-cp claude-logo.png /Applications/CCMenuBar.app/Contents/Resources/
+cp claude_logo.png /Applications/CCMenuBar.app/Contents/Resources/
 ```
 
 ### Status not updating from Claude Code

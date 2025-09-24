@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+*.app
+
+# Build artifacts
+build/
+*.dmg
+*.pkg
+*.zip
+
+# Personal settings
+.claude/settings.local.json
+
+# Temporary files
+*.tmp
+*~
